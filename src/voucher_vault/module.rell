@@ -1,0 +1,15 @@
+module;
+
+import .model.*;
+
+function is_signed() = require(op_context.get_signers().size() == 1, "Transaction must be signed");
+
+function get_random_number(high: integer = 100): integer {
+    if (high == 0) return 0;
+    return (op_context.last_block_time - op_context.block_height - op_context.op_index) % high + 1;
+}
+
+function get_random_number_in_range(from: integer, to: integer): integer {
+    require(from <= to, "To must be higher than from");
+    return from + get_random_number(to - from);
+}

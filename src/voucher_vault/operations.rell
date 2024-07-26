@@ -1,0 +1,50 @@
+module;
+
+import voucher_vault.*;
+import ^.model.*;
+// import lib.ft4.auth;
+// import lib.ft4.accounts.strategies.open;
+// import lib.ft4.accounts.strategies.{ register_account };
+
+// @extend(auth.auth_handler)
+// function () = auth.add_auth_handler(
+//     flags = ["MySession"]
+// );
+operation register_as_brand(name: text) {
+    is_signed();
+    // register_account();
+    create brand ( op_context.get_signers()[0], name );
+}
+
+operation register_as_user() {
+    is_signed();
+    // register_account();
+    create user ( op_context.get_signers()[0] );
+}
+
+operation create_voucher_type(
+    id: text,
+    desc: text,
+    max_discount: integer,
+    max_quantity: integer,
+) {
+    is_signed();
+    // auth.authenticate();
+    val brand = require(brand @? { .pub_key == op_context.get_signers()[0] }, "Signer is not registered as brand");
+    require(
+        max_discount > 1 and max_discount <= 100,
+        "Max discount percentage should be greater than 1 and less than equals 100"
+    );
+    create voucher_type ( id, brand, desc, max_discount, max_quantity );
+}
+
+operation mint_nft_voucher(voucher_type_id: text) {
+    is_signed();
+    // auth.authenticate();
+    val voucher_type = require(voucher_type @? { .id == voucher_type_id }, "Invalid voucher type id");
+    require(voucher_type.minted_nft_count < voucher_type.max_quantity, "ALL NFT VOUCHERS HAVE BEEN CLAIMED");
+    val user = require(user @? { .pub_key == op_context.get_signers()[0] }, "Signer is not registered as user");
+    val discount = get_random_number_in_range(1, voucher_type.max_quantity);
+    create nft_voucher ( user, voucher_type, discount );
+    update voucher_type ( minted_nft_count+=1 );
+}

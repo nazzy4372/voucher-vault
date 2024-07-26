@@ -1,0 +1,27 @@
+module;
+
+entity brand {
+    key pub_key: byte_array;
+    name: text;
+}
+
+entity user {
+    key pub_key: byte_array;
+}
+
+entity voucher_type {
+    key id: text;
+    index brand;
+    desc: text;
+    max_discount: integer;
+    max_quantity: integer;
+    mutable minted_nft_count: integer = 0;
+}
+
+entity nft_voucher {
+    key id: byte_array = op_context.transaction.tx_rid;
+    index owner: user;
+    index voucher_type;
+    discount: integer;
+    timestamp = op_context.last_block_time;
+}

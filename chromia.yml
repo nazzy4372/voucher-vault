@@ -1,0 +1,35 @@
+blockchains:
+  voucher_vault:
+    module: main
+    moduleArgs:
+      lib.ft4.core.auth:
+        evm_signatures_authorized_operations:
+          - register_as_brand
+          - register_as_user
+compile:
+  rellVersion: 0.13.5
+libs:
+  ft4:
+    registry: https://bitbucket.org/chromawallet/ft3-lib
+    path: rell/src/lib/ft4
+    tagOrBranch: v0.8.0r
+    rid: x"B6AE6AC82AC735BFB9E4E412FFB76BF95380E94F371F5F6A14E71A3AA7D5FEF6"
+    insecure: false
+  iccf:
+    registry: https://gitlab.com/chromaway/core/directory-chain
+    path: src/iccf
+    tagOrBranch: 1.35.0
+    rid: x"1D567580C717B91D2F188A4D786DB1D41501086B155A68303661D25364314A4D"
+    insecure: false
+deployments:
+  testnet:
+    brid: x"69035D70A99A6BFAF887E415352B40589F1AD1F8D2ADF848FE995B23A8EC2127" 
+    url: https://node0.projectnet.chromia.dev:7740
+    container: ce2015e964dd58d01ea7a25f83db41f0ce6e1ff3b7d356b665dc5469d2cd9369
+    chains:
+      voucher_vault: x"D3306C0E720770111C9C4A96A87E290CB1A4060B038597CA409028F6061CC7F1"
+database:
+  schema: schema_voucher_vault
+test:
+  modules:
+    - test
