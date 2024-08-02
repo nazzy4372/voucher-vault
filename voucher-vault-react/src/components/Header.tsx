@@ -2,14 +2,13 @@ import { Button, Layout, Typography, ConfigProvider } from "antd";
 import { useSessionContext } from "../providers/ContextProvider";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 
-import logo from "../assets/logo.svg"
+import logo from "../assets/logo.svg";
 import { useState } from "react";
 const _Header = () => {
   const { session, brand, user } = useSessionContext();
-  const Navigation = useNavigate()
+  const navigate = useNavigate();
   const { Header } = Layout;
   const { pathname } = useLocation();
- 
 
   const onLogoutClick = () => {
     window.location.pathname = "/register";
@@ -24,11 +23,16 @@ const _Header = () => {
         position: "fixed",
         width: "100vw",
         zIndex: "100",
-        height:"70px",
+        height: "70px",
         justifyContent: "space-between",
       }}
     >
-      <div style={{ color: "#fff",height:"100%",cursor:"pointer" }} onClick={()=>(window.location.pathname = "/register")}><img src={logo} style={{height:"60px",margin:"5px 0px"}}/></div>
+      <div
+        style={{ color: "#fff", height: "100%", cursor: "pointer" }}
+        onClick={() => (window.location.pathname = "/register")}
+      >
+        <img src={logo} style={{ height: "60px", margin: "5px 0px" }} />
+      </div>
       <div>
         <ConfigProvider theme={{ token: { colorPrimary: "#EA9A00" } }}>
           <div
@@ -39,22 +43,26 @@ const _Header = () => {
               textTransform: "capitalize",
             }}
           >
-
-            {user && pathname !== "/minted-nft-vouchers" && (
-              // <Typography.Link
-              //   style={{
-              //     color: "#ffff",
-              //     fontWeight: "600",
-              //     flex: "1 0 max-content",
-              //   }}
-              // >
-              <Button type="primary" onClick={() => { Navigation("/minted-nft-vouchers") }}>
-                View Minted Vouchers
-              </Button>
-
-
-              // </Typography.Link>
-            )}
+            {user &&
+              (pathname === "/minted-nft-vouchers" ? (
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    navigate("/customer");
+                  }}
+                >
+                  Home
+                </Button>
+              ) : (
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    navigate("/minted-nft-vouchers");
+                  }}
+                >
+                  View Minted Vouchers
+                </Button>
+              ))}
             {brand && (
               <Typography.Text
                 style={{
@@ -67,18 +75,12 @@ const _Header = () => {
               </Typography.Text>
             )}
             {session && (
-              <Button
-                type="dashed"
-                htmlType="button"
-                onClick={onLogoutClick}
-                
-              >
+              <Button type="dashed" htmlType="button" onClick={onLogoutClick}>
                 Logout
               </Button>
             )}
           </div>
         </ConfigProvider>
-
       </div>
     </Header>
   );

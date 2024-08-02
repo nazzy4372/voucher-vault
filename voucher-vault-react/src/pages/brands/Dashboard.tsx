@@ -40,7 +40,7 @@ const Dashboard = () => {
   const [isNftCollectionsLoading, setIsNftCollectionsLoading] = useState(true);
   const [form] = Form.useForm<CreateNftCollectionInput>();
   const notification = useNotificationContext();
-  const [loadingButton,setLoadingButton]=useState(false)
+  const [loadingButton, setLoadingButton] = useState(false);
   const { session } = useSessionContext();
 
   const fetchNftVoucherCollections = useCallback(async () => {
@@ -68,7 +68,7 @@ const Dashboard = () => {
 
   const onSubmit = async (values: CreateNftCollectionInput) => {
     if (!session) return;
-    setLoadingButton(true)
+    setLoadingButton(true);
 
     try {
       const { name, desc, total_supply, max_discount } = values;
@@ -81,11 +81,21 @@ const Dashboard = () => {
       });
       form.resetFields();
       fetchNftVoucherCollections();
-      setLoadingButton(false)
-    } catch (error) {
+      setLoadingButton(false);
+    } catch (error: any) {
       console.error(error);
-      setLoadingButton(false)
-      notification.error({ message: "Error adding NFT Voucher Collection!" });
+      const errorMessage = error.message as string;
+      if (
+        errorMessage &&
+        errorMessage.includes("duplicate key value violates unique constraint")
+      ) {
+        notification.error({
+          message: "Collection with same name already exists!",
+        });
+      } else {
+        notification.error({ message: "Error adding NFT Voucher Collection!" });
+      }
+      setLoadingButton(false);
     }
   };
 

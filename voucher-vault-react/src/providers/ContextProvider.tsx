@@ -172,9 +172,22 @@ export function ContextProvider({ children }: { children: ReactNode }) {
           navigate(`/dashboard${qs}`);
         } catch (error: any) {
           console.error(error);
-          notification.error({
-            message: "Error registering your account! Please try again.",
-          });
+          if (
+            error.message &&
+            error.message.includes(
+              "duplicate key value violates unique constraint"
+            )
+          ) {
+            notification.error({
+              message: "Brand with this name already exists!",
+              onClose() {
+                window.location.reload();
+              },
+            });
+          } else
+            notification.error({
+              message: "Error registering your account! Please try again.",
+            });
         }
       }
     } catch (error) {

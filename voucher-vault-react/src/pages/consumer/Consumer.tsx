@@ -38,6 +38,10 @@ const Consumer = () => {
   const [selectedBrand, setSelectedBrand] = useState<BrandDto | null>(null);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [buttonLoading, setLoadingButton] = useState<[boolean, number]>([
+    false,
+    -1,
+  ]);
   const [allNftCollections, setAllNftCollections] = useState<
     NftVoucherCollectionDto[]
   >([]);
@@ -51,7 +55,12 @@ const Consumer = () => {
   const { session } = useSessionContext();
   const navigate = useNavigate();
 
-  const mintNftVoucher = async (collection: NftVoucherCollectionDto) => {
+  const mintNftVoucher = async (
+    collection: NftVoucherCollectionDto,
+    i: number
+  ) => {
+    setLoadingButton([true, i]);
+
     if (!session) return;
 
     try {
@@ -64,7 +73,9 @@ const Consumer = () => {
       setOpenDrawer(false);
       setSelectedBrand(null);
       await fetchAllCollections();
+      setLoadingButton([false, i]);
     } catch (error) {
+      setLoadingButton([false, i]);
       console.error(error);
       notification.error({ message: "Error minting NFT Voucher!" });
     }
@@ -214,6 +225,7 @@ const Consumer = () => {
             onClose={() => {
               setOpenDrawer(false);
               setSelectedBrand(null);
+              setLoadingButton([false, -1]);
             }}
             open={openDrawer}
           >
@@ -228,7 +240,10 @@ const Consumer = () => {
                       val.brand.name
                   )
                   .findIndex(
-                    (minted) => minted.nft_voucher_collection.name === val.name
+                    (minted) =>
+                      minted.nft_voucher_collection.name === val.name &&
+                      minted.nft_voucher_collection.brand.name ===
+                        val.brand.name
                   ) !== -1;
 
               return (
@@ -286,8 +301,9 @@ const Consumer = () => {
                           style={{ marginTop: "20px" }}
                           disabled={!isAvailable}
                           onClick={async () => {
-                            if (isAvailable) await mintNftVoucher(val);
+                            if (isAvailable) await mintNftVoucher(val, i);
                           }}
+                          loading={buttonLoading[1] === i && buttonLoading[0]}
                         >
                           {" "}
                           Mint Voucher
