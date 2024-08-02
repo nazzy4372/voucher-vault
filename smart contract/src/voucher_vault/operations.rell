@@ -1,0 +1,56 @@
+module;
+
+import voucher_vault.*;
+import ^.model.*;
+import lib.ft4.auth;
+import lib.ft4.accounts.strategies.open;
+import lib.ft4.accounts.strategies.{ register_account };
+
+@extend(auth.auth_handler)
+function () = auth.add_auth_handler(
+    flags = ["MySession"]
+);
+
+operation register_as_brand(name: text) {
+    val account = register_account();
+    create brand ( account, name );
+}
+
+operation register_as_user() {
+    val account = register_account();
+    create user ( account );
+}
+
+operation create_nft_voucher_collection(
+    name: text,
+    desc: text,
+    max_discount: integer,
+    total_supply: integer,
+) {
+    val account = auth.authenticate();
+    val brand = require(brand @? { .account == account }, "Signer is not registered as brand");
+    require(
+        max_discount > 0 and max_discount <= 100,
+        "Max discount percentage should be greater than 0 and less than equals 100"
+    );
+    create nft_voucher_collection ( name, brand, desc, max_discount, total_supply );
+}
+
+operation mint_nft_voucher(brand_account_id: byte_array, nft_voucher_collection_name: text) {
+    val account = auth.authenticate();
+    val nft_voucher_collection = require(
+        nft_voucher_collection @? {
+            .brand.account.id == brand_account_id,
+            .name == nft_voucher_collection_name
+        },
+        "Invalid NFT Voucher Collection"
+    );
+    require(
+        nft_voucher_collection.minted_nft_count < nft_voucher_collection.total_supply,
+        "ALL NFT VOUCHERS HAVE BEEN CLAIMED"
+    );
+    val user = require(user @? { .account == account }, "Signer is not registered as user");
+    val discount = get_random_number_in_range(1, nft_voucher_collection.max_discount);
+    create nft_voucher ( user, nft_voucher_collection, discount );
+    update nft_voucher_collection ( minted_nft_count+=1 );
+}

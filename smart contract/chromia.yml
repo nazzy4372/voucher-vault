@@ -6,6 +6,9 @@ blockchains:
         evm_signatures_authorized_operations:
           - register_as_brand
           - register_as_user
+      lib.ft4.core.accounts:  
+        auth_descriptor:
+          max_number_per_account: 100
 compile:
   rellVersion: 0.13.5
 libs:
@@ -27,7 +30,7 @@ deployments:
     url: https://node0.projectnet.chromia.dev:7740
     container: ce2015e964dd58d01ea7a25f83db41f0ce6e1ff3b7d356b665dc5469d2cd9369
     chains:
-      voucher_vault: x"D3306C0E720770111C9C4A96A87E290CB1A4060B038597CA409028F6061CC7F1"
+      voucher_vault: x"56B4895B43D7507C3113406A91CA44113CA626CE7FA0B635F716678E394734B7"
 database:
   schema: schema_voucher_vault
 test:

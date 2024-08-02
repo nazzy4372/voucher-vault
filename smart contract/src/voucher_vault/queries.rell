@@ -1,0 +1,173 @@
+module;
+
+import ^.model.*;
+import ^.dto.*;
+
+query get_brand(brand_account_id: byte_array) {
+    return brand @ { .account.id == brand_account_id } ( brand_dto (.account.to_struct(), .name) );
+}
+
+query get_user(user_account_id: byte_array) {
+    return user @ { .account.id == user_account_id } ( user_dto (.account.to_struct()) );
+}
+
+query get_nft_voucher_collection_by_brand(nft_voucher_collection_name: text, brand_account_id: byte_array) {
+    return nft_voucher_collection @ {
+        .brand.account.id == brand_account_id,
+        .name == nft_voucher_collection_name
+    } (
+        nft_voucher_collection_dto (
+            .name,
+            brand_dto(
+            .brand.account.to_struct(),
+            .brand.name
+        ),
+            .desc,
+            .max_discount,
+            .total_supply,
+            .minted_nft_count
+        )
+    );
+}
+
+query get_nft_voucher_collections_by_brand(brand_account_id: byte_array) {
+    return nft_voucher_collection @* {
+        .brand.account.id == brand_account_id,
+    } (
+        nft_voucher_collection_dto (
+            .name,
+            brand_dto(
+            .brand.account.to_struct(),
+            .brand.name
+        ),
+            .desc,
+            .max_discount,
+            .total_supply,
+            .minted_nft_count
+        )
+    );
+}
+
+query get_nft_vouchers_by_owner(user_account_id: byte_array) {
+    val owner = user @ { .account.id == user_account_id };
+    return nft_voucher @* {
+        .owner == owner
+    } (
+        nft_voucher_dto (
+            .id,
+            user_dto(
+            .owner.account.to_struct()
+        ),
+            .discount,
+            nft_voucher_collection_dto(
+            name = .nft_voucher_collection.name,
+            brand_dto(
+                .nft_voucher_collection.brand.account.to_struct(),
+                .nft_voucher_collection.brand.name
+            ),
+            desc = .nft_voucher_collection.desc,
+            max_discount = .nft_voucher_collection.max_discount,
+            total_supply = .nft_voucher_collection.total_supply,
+            minted_nft_count = .nft_voucher_collection.minted_nft_count
+        )
+        )
+    );
+}
+
+query get_nft_voucher_by_brand(brand_account_id: byte_array) {
+    return nft_voucher @* {
+        .nft_voucher_collection.brand.account.id == brand_account_id
+    } (
+        nft_voucher_dto (
+            .id,
+            user_dto(
+            .owner.account.to_struct()
+        ),
+            .discount,
+            nft_voucher_collection_dto(
+            name = .nft_voucher_collection.name,
+            brand_dto(
+                .nft_voucher_collection.brand.account.to_struct(),
+                .nft_voucher_collection.brand.name
+            ),
+            desc = .nft_voucher_collection.desc,
+            max_discount = .nft_voucher_collection.max_discount,
+            total_supply = .nft_voucher_collection.total_supply,
+            minted_nft_count = .nft_voucher_collection.minted_nft_count
+        )
+        )
+    );
+}
+
+query get_nft_voucher_by_brand_collection(brand_account_id: byte_array, nft_voucher_collection_name: text) {
+    return nft_voucher @* {
+        .nft_voucher_collection.name == nft_voucher_collection_name,
+        .nft_voucher_collection.brand.account.id == brand_account_id
+    } (
+        nft_voucher_dto (
+            .id,
+            user_dto(
+            .owner.account.to_struct()
+        ),
+            .discount,
+            nft_voucher_collection_dto(
+            name = .nft_voucher_collection.name,
+            brand_dto(
+                .nft_voucher_collection.brand.account.to_struct(),
+                .nft_voucher_collection.brand.name
+            ),
+            desc = .nft_voucher_collection.desc,
+            max_discount = .nft_voucher_collection.max_discount,
+            total_supply = .nft_voucher_collection.total_supply,
+            minted_nft_count = .nft_voucher_collection.minted_nft_count
+        )
+        )
+    );
+}
+
+query get_brands() {
+    return brand @* { } ( brand_dto (.account.to_struct(), .name) );
+}
+
+query get_users() {
+    return user @* { } ( user_dto (.account.to_struct()) );
+}
+
+query get_nft_voucher_collections() {
+    return nft_voucher_collection @* { } (
+        nft_voucher_collection_dto (
+            .name,
+            brand_dto(
+            .brand.account.to_struct(),
+            .brand.name
+        ),
+            .desc,
+            .max_discount,
+            .total_supply,
+            .minted_nft_count
+        )
+    );
+}
+
+query get_nft_vouchers() {
+    return nft_voucher @* { } (
+        nft_voucher_dto (
+            .id,
+            user_dto(
+            .owner.account.to_struct()
+        ),
+            .discount,
+            nft_voucher_collection_dto(
+            name = .nft_voucher_collection.name,
+            brand_dto(
+                .nft_voucher_collection.brand.account.to_struct(),
+                .nft_voucher_collection.brand.name
+            ),
+            desc = .nft_voucher_collection.desc,
+            max_discount = .nft_voucher_collection.max_discount,
+            total_supply = .nft_voucher_collection.total_supply,
+            minted_nft_count = .nft_voucher_collection.minted_nft_count
+        )
+        )
+    );
+}

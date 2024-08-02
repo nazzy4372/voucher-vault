@@ -1,0 +1,28 @@
+module;
+
+import ^.model.*;
+
+struct brand_dto {
+    account: struct<account>;
+    name: text;
+}
+
+struct user_dto {
+    account: struct<account>;
+}
+
+struct nft_voucher_collection_dto {
+    name: text;
+    brand: brand_dto;
+    desc: text;
+    max_discount: integer;
+    total_supply: integer;
+    minted_nft_count: integer;
+}
+
+struct nft_voucher_dto {
+    id: byte_array;
+    owner: user_dto;
+    nft_voucher_collection: nft_voucher_collection_dto;
+    discount: integer;
+}

@@ -1,0 +1,30 @@
+module;
+import lib.ft4.core.accounts.{ account };
+
+entity brand {
+    key account;
+    key name: text;
+}
+
+entity user {
+    key account;
+}
+
+entity nft_voucher_collection {
+    name: text;
+    brand;
+    key name, brand;
+    desc: text;
+    max_discount: integer;
+    total_supply: integer;
+    mutable minted_nft_count: integer = 0;
+}
+
+entity nft_voucher {
+    id: byte_array = op_context.transaction.tx_rid;
+    index owner: user;
+    index nft_voucher_collection;
+    key owner, nft_voucher_collection;
+    discount: integer;
+    timestamp = op_context.last_block_time;
+}
